@@ -1,0 +1,185 @@
+
+Handlight.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000c8  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  0000011c  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  0000011c  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000014c  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000020  00000000  00000000  00000188  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   0000051f  00000000  00000000  000001a8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000004a4  00000000  00000000  000006c7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000225  00000000  00000000  00000b6b  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000024  00000000  00000000  00000d90  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000002b8  00000000  00000000  00000db4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000010  00000000  00000000  0000106c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	18 c0       	rjmp	.+48     	; 0x36 <__bad_interrupt>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+  14:	10 c0       	rjmp	.+32     	; 0x36 <__bad_interrupt>
+  16:	0f c0       	rjmp	.+30     	; 0x36 <__bad_interrupt>
+  18:	0e c0       	rjmp	.+28     	; 0x36 <__bad_interrupt>
+  1a:	0d c0       	rjmp	.+26     	; 0x36 <__bad_interrupt>
+  1c:	0c c0       	rjmp	.+24     	; 0x36 <__bad_interrupt>
+  1e:	0b c0       	rjmp	.+22     	; 0x36 <__bad_interrupt>
+  20:	0a c0       	rjmp	.+20     	; 0x36 <__bad_interrupt>
+  22:	09 c0       	rjmp	.+18     	; 0x36 <__bad_interrupt>
+  24:	08 c0       	rjmp	.+16     	; 0x36 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf e5       	ldi	r28, 0x5F	; 95
+  2c:	d4 e0       	ldi	r29, 0x04	; 4
+  2e:	de bf       	out	0x3e, r29	; 62
+  30:	cd bf       	out	0x3d, r28	; 61
+  32:	02 d0       	rcall	.+4      	; 0x38 <main>
+  34:	47 c0       	rjmp	.+142    	; 0xc4 <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <main>:
+
+
+int main(void)
+{
+    //Включаем шим OC1A
+	TCCR1A |= (1<<COM1A1);
+  38:	8f b5       	in	r24, 0x2f	; 47
+  3a:	80 68       	ori	r24, 0x80	; 128
+  3c:	8f bd       	out	0x2f, r24	; 47
+	TCCR1A &= ~(1<<COM1A0);
+  3e:	8f b5       	in	r24, 0x2f	; 47
+  40:	8f 7b       	andi	r24, 0xBF	; 191
+  42:	8f bd       	out	0x2f, r24	; 47
+
+	//Выставляем делитель частоты OC1A
+	TCCR1B |= (1<<CS10);
+  44:	8e b5       	in	r24, 0x2e	; 46
+  46:	81 60       	ori	r24, 0x01	; 1
+  48:	8e bd       	out	0x2e, r24	; 46
+	TCCR1B &= ~(1<<CS11);
+  4a:	8e b5       	in	r24, 0x2e	; 46
+  4c:	8d 7f       	andi	r24, 0xFD	; 253
+  4e:	8e bd       	out	0x2e, r24	; 46
+	TCCR1B &= ~(1<<CS12);
+  50:	8e b5       	in	r24, 0x2e	; 46
+  52:	8b 7f       	andi	r24, 0xFB	; 251
+  54:	8e bd       	out	0x2e, r24	; 46
+	
+	//Режим быстродействующей шим OC1A
+	TCCR1A |= (1<<WGM10);
+  56:	8f b5       	in	r24, 0x2f	; 47
+  58:	81 60       	ori	r24, 0x01	; 1
+  5a:	8f bd       	out	0x2f, r24	; 47
+	TCCR1A |= (1<<WGM11);
+  5c:	8f b5       	in	r24, 0x2f	; 47
+  5e:	82 60       	ori	r24, 0x02	; 2
+  60:	8f bd       	out	0x2f, r24	; 47
+	TCCR1B |= (1<<WGM12);
+  62:	8e b5       	in	r24, 0x2e	; 46
+  64:	88 60       	ori	r24, 0x08	; 8
+  66:	8e bd       	out	0x2e, r24	; 46
+	TCCR1B &= ~(1<<WGM13);
+  68:	8e b5       	in	r24, 0x2e	; 46
+  6a:	8f 7e       	andi	r24, 0xEF	; 239
+  6c:	8e bd       	out	0x2e, r24	; 46
+
+	//Выставляем делитель частоты OC1A
+	TCCR1B |= (1<<CS10);
+  6e:	8e b5       	in	r24, 0x2e	; 46
+  70:	81 60       	ori	r24, 0x01	; 1
+  72:	8e bd       	out	0x2e, r24	; 46
+	TCCR1B &= ~(1<<CS11);
+  74:	8e b5       	in	r24, 0x2e	; 46
+  76:	8d 7f       	andi	r24, 0xFD	; 253
+  78:	8e bd       	out	0x2e, r24	; 46
+	TCCR1B &= ~(1<<CS12);
+  7a:	8e b5       	in	r24, 0x2e	; 46
+  7c:	8b 7f       	andi	r24, 0xFB	; 251
+  7e:	8e bd       	out	0x2e, r24	; 46
+
+	//Включаем шим OC1B
+	TCCR2 &= ~(1<<COM20);
+  80:	85 b5       	in	r24, 0x25	; 37
+  82:	8f 7e       	andi	r24, 0xEF	; 239
+  84:	85 bd       	out	0x25, r24	; 37
+	TCCR2 |= (1<<COM21);
+  86:	85 b5       	in	r24, 0x25	; 37
+  88:	80 62       	ori	r24, 0x20	; 32
+  8a:	85 bd       	out	0x25, r24	; 37
+
+	//Режим быстродействующей шим OC1B
+	TCCR2 |= (1<<WGM21);
+  8c:	85 b5       	in	r24, 0x25	; 37
+  8e:	88 60       	ori	r24, 0x08	; 8
+  90:	85 bd       	out	0x25, r24	; 37
+	TCCR2 |= (1<<WGM20);
+  92:	85 b5       	in	r24, 0x25	; 37
+  94:	80 64       	ori	r24, 0x40	; 64
+  96:	85 bd       	out	0x25, r24	; 37
+
+	//Выставляем делитель частоты OC1B
+	TCCR2 |= (1<<CS20);
+  98:	85 b5       	in	r24, 0x25	; 37
+  9a:	81 60       	ori	r24, 0x01	; 1
+  9c:	85 bd       	out	0x25, r24	; 37
+	TCCR2 &= ~(1<<CS21);
+  9e:	85 b5       	in	r24, 0x25	; 37
+  a0:	8d 7f       	andi	r24, 0xFD	; 253
+  a2:	85 bd       	out	0x25, r24	; 37
+	TCCR2 &= ~(1<<CS22);
+  a4:	85 b5       	in	r24, 0x25	; 37
+  a6:	8b 7f       	andi	r24, 0xFB	; 251
+  a8:	85 bd       	out	0x25, r24	; 37
+
+	//Настраиваем пины на выход
+	DDRB |= ((1<<1) | (1<<3));
+  aa:	87 b3       	in	r24, 0x17	; 23
+  ac:	8a 60       	ori	r24, 0x0A	; 10
+  ae:	87 bb       	out	0x17, r24	; 23
+	PORTB &= ~((1<<1) | (1<<3));
+  b0:	88 b3       	in	r24, 0x18	; 24
+  b2:	85 7f       	andi	r24, 0xF5	; 245
+  b4:	88 bb       	out	0x18, r24	; 24
+
+	//Регстр сравнения OC1A
+	OCR1A = 1023;
+  b6:	8f ef       	ldi	r24, 0xFF	; 255
+  b8:	93 e0       	ldi	r25, 0x03	; 3
+  ba:	9b bd       	out	0x2b, r25	; 43
+  bc:	8a bd       	out	0x2a, r24	; 42
+	OCR2  = 128;
+  be:	80 e8       	ldi	r24, 0x80	; 128
+  c0:	83 bd       	out	0x23, r24	; 35
+  c2:	ff cf       	rjmp	.-2      	; 0xc2 <__SREG__+0x83>
+
+000000c4 <_exit>:
+  c4:	f8 94       	cli
+
+000000c6 <__stop_program>:
+  c6:	ff cf       	rjmp	.-2      	; 0xc6 <__stop_program>
